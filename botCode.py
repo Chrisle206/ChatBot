@@ -31,15 +31,18 @@ async def on_message(message):
     Event triggered whenever a message is sent in any server the bot is connected to.
     """
     username = str(message.author).split("#")[0]  # Extract username from message author's name
-    channel = str(1245794405349068800)  # ID of the channel where the bot will respond
     user_message = str(message.content)  # Extract the content of the message
 
-    print(f'Message from {username} in {channel}: {user_message}')  # Log the message received
+    print(f'Message from {username} in {message.channel}: {user_message}')  # Log the message received
 
     if message.author == client.user:
         return  # Ignore messages sent by the bot itself
 
-    if channel == "1245794405349068800":
+    # Find the channel where the bot should respond
+    target_channel_name = "botchat"  # Replace with the actual name of the channel
+    target_channel = discord.utils.get(message.guild.channels, name=target_channel_name)
+
+    if target_channel and message.channel == target_channel:
         # If the message is sent in the specified channel and is "hello", respond with a greeting
         if user_message.lower() == "hello":
             await message.channel.send(f'Hello {username}!')

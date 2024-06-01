@@ -1,45 +1,49 @@
-#
-import discord 
+import discord
 import os
-import random
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
+from discord.ext import commands
+from ec2_metadata import ec2_metadata
 
 # Load environment variables from secret.env file.
-load_dotenv('secret.env') 
+load_dotenv('secret.env')
 
-# Creating discord client to send a request to discord API
-client = discord.Bot() 
+# Request the necessary intents
+intents = discord.Intents.default()
+intents.members = True  # Enable the members intent
+intents.presences = True  # Enable the presence intent if needed
 
-# Access the environment variable.
-token = os.getenv('TOKEN')
+# Initialize the bot with these intents
+client = commands.Bot(command_prefix='!', intents=intents)
 
+# Access the environment variable for the bot token
+token = str(os.getenv('CHAT_BOT_TOKEN'))
 
-@client.event 
-async def on_ready(): 
-	print("Logged in as a bot {0.user}".format(client))
+@client.event
+async def on_ready():
+    """
+    Event triggered when the bot is successfully logged in and ready to start processing events.
+    """
+    print(f'Logged in as {client.user}')
 
-@client.event 
-async def on_message(message): 
-	username = str(message.author).split("#")[0] 
-	channel = str(message.channel.name) 
-	user_message = str(message.content) 
+@client.event
+async def on_message(message):
+    """
+    Event triggered whenever a message is sent in any server the bot is connected to.
+    """
+    username = str(message.author).split("#")[0]  # Extract username from message author's name
+    channel = str(1245794405349068800)  # ID of the channel where the bot will respond
+    user_message = str(message.content)  # Extract the content of the message
 
-	print(f'Message {user_message} by {username} on {channel}') 
+    print(f'Message from {username} in {channel}: {user_message}')  # Log the message received
 
-	if message.author == client.user: 
-		return
+    if message.author == client.user:
+        return  # Ignore messages sent by the bot itself
 
-	if channel == "random": 
-		if user_message.lower() == "hello" or user_message.lower() == "hi": 
-			await message.channel.send(f'Hello {username}') 
-			return
-		elif user_message.lower() == "bye": 
-			await message.channel.send(f'Bye {username}') 
-		elif user_message.lower() == "tell me a joke": 
-			jokes = [" Can someone please shed more\ light on how my lamp got stolen?", 
-					"Why is she called llene? She\ stands on equal legs.", 
-					"What do you call a gazelle in a \ lions territory? Denzel."] 
-			await message.channel.send(random.choice(jokes)) 
-			
-client.run(token)
+    if channel == "1245794405349068800":
+        # If the message is sent in the specified channel and is "hello", respond with a greeting
+        if user_message.lower() == "hello":
+            await message.channel.send(f'Hello {username}!')
+            await message.channel.send(f"Sooner! {username} Your EC2 Data: {ec2_metadata.region}")
+            return
 
+client.run(token)  # Run the bot with the provided token

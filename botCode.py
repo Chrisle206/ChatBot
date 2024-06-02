@@ -7,18 +7,18 @@ from ec2_metadata import ec2_metadata
 # Load environment variables from secret.env file.
 load_dotenv('secret.env')
 
-# Log the loaded environment variable
-print(f"Loaded bot token: {os.getenv('CHAT_BOT_TOKEN')}")
+# Log the loaded environment variable for debugging
+token = str(os.getenv('CHAT_BOT_TOKEN'))
+print(f"Loaded bot token: {token}")
 
 # Request the necessary intents
 intents = discord.Intents.default()
-intents.messages = True  # Enable message content intent
+intents.message_content = True  # Enable the message content intent
+intents.members = True  # Enable the members intent if needed
+intents.presences = True  # Enable the presence intent if needed
 
 # Initialize the bot with these intents
 client = commands.Bot(command_prefix='!', intents=intents)
-
-# Access the environment variable for the bot token
-token = str(os.getenv('CHAT_BOT_TOKEN'))
 
 @client.event
 async def on_ready():

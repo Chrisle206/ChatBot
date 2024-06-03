@@ -4,18 +4,24 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from ec2_metadata import ec2_metadata
 
-# Load environment variables from secret.env file.
-load_dotenv('secret.env')
-
 # Log the loaded environment variable for debugging
-token = str(os.getenv('CHAT_BOT_TOKEN'))
+token = os.getenv('CHAT_BOT_TOKEN')
 print(f"Loaded bot token: {token}")
 
+# Ensure the token is correctly loaded
+if not token:
+    print("Error: Bot token not found in environment variables.")
+    exit(1)
+
 # Request the necessary intents
-intents = discord.Intents.default()
-intents.message_content = True  # Enable the message content intent
-intents.members = True  # Enable the members intent if needed
-intents.presences = True  # Enable the presence intent if needed
+try:
+    intents = discord.Intents.default()
+    intents.message_content = True  # Enable the message content intent
+    intents.members = True  # Enable the members intent if needed
+    intents.presences = True  # Enable the presence intent if needed
+except AttributeError as e:
+    print(f"Error initializing intents: {e}")
+    exit(1)
 
 # Initialize the bot with these intents
 client = commands.Bot(command_prefix='!', intents=intents)
@@ -55,5 +61,5 @@ async def on_message(message):
                 print(f"Error accessing EC2 metadata: {e}")
                 await message.channel.send(f"Could not retrieve EC2 data: {e}")
             return
-
+print("before: " + token)
 client.run(token)  # Run the bot with the provided token
